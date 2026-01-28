@@ -1,0 +1,30 @@
+services:
+  postgres:
+    container_name: db-tools-postgres
+    image: postgres:18-alpine
+    restart: no
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      # TODO script to create a backup and SCP it to server or CDN or AWS S3...etc
+      BACKUP_CDN_URL: ''
+      BACKUP_CDN_SECRET_KEY: ''
+      BACKUP_INTERVAL: '0 0 * * *' # Daily
+    ports:
+      - 5433:5432
+    volumes:
+      - ./pgdata:/var/lib/postgresql
+  adminer:
+    container_name: db-tools-adminer
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 8082:8080
+    environment:
+      ADMINER_PLUGINS: 'dump-json tables-filter json-column sql-log sql-gemini'
+volumes:
+  pgdata: {}
+networks:
+  default: {}
+
+

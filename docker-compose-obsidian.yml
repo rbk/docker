@@ -1,0 +1,16 @@
+version: '3.9'
+services:
+  linuxserver:
+    image: 'lscr.io/linuxserver/obsidian:latest'
+    restart: unless-stopped
+    shm_size: 1gb
+    volumes:
+      - '/path/to/config:/config'
+    ports:
+      - '3001:3001'
+      - '3000:3000'
+    environment:
+      - TZ=Etc/UTC
+      - PGID=1000
+      - PUID=1000
+    container_name: obsidian

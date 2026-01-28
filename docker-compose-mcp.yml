@@ -1,0 +1,69 @@
+services:
+  # AI Model API using Ollama
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ai_model_api
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./models:/models
+    environment:
+      - OLLAMA_ORIGINS=*
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - ai_mpc_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # AI Model Web UI (optional frontend)
+  ollama-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ai_webui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    volumes:
+      - volume-data/ollama_webui_data:/app/backend/data
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    networks:
+      - ai_mpc_network
+
+  # MPC Node 1 (SCALE-MAMBA)
+  mpc_node_1:
+    image: koclab/scale-mamba:latest
+    container_name: mpc_node_1
+    ports:
+      - "14001:14001"
+      - "15001:15001"
+    volumes:
+      - ./volume-data/mpc_config:/opt/scale-mamba/Player-Data
+      - ./volume-data/mpc_programs:/opt/scale-mamba/Programs
+      - volume-data/mpc_node1_data:/opt/scale-mamba/Data
+    environment:
+      - PLAYER_ID=0
+      - NUM_PLAYERS=3
+      - PRIME=2147483647
+    command: >
+      sh -c "
+        cd /opt/scale-mamba &&
+        ./Scripts/setup.sh 0 &&
+        ./Player.x 0 tutorial
+      "
+    networks:
+      - ai_mpc_network
+    restart: unless-stopped

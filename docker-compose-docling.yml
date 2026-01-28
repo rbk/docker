@@ -1,0 +1,16 @@
+services:
+  docling-server:
+    image: ghcr.io/docling-project/docling-serve:latest
+    container_name: docling-server
+    environment:
+      # Optional: Enable the simple web UI at http://localhost:5001/ui
+      DOCLING_SERVE_ENABLE_UI: "1"
+    volumes:
+     - ./volume-data/docling/data:/app/data
+     - ./volume-data/docling/config:/app/config
+    ports:
+      - "5001:5001"  # Maps host port 8080 to the container's port
+    restart: unless-stopped
+    # user: 1000:1000 # Optional: Run as a specific user
+
+# To start the service, run: docker-compose up -d
