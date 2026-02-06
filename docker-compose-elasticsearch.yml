@@ -1,0 +1,26 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      http.cors.enabled: "true"
+      http.cors.allow-origin: "http://localhost:3000,http://localhost:5173"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+#  kibana:
+#    image: docker.elastic.co/kibana/kibana:9.3.0
+#    volumes:
+#      - ./kibana.yml:/usr/share/kibana/config/kibana.yml
+#
+#  app:
+#    build:
+#      context: ./notes-app
+#      dockerfile: Dockerfile
+#      args:
+#        VITE_ELASTICSEARCH_URL: "http://localhost:9200"
+#    ports:
+#      - "3000:80"
+#    depends_on:
+#      - elasticsearch

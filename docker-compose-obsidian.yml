@@ -1,16 +1,16 @@
-version: '3.9'
 services:
-  linuxserver:
-    image: 'lscr.io/linuxserver/obsidian:latest'
-    restart: unless-stopped
-    shm_size: 1gb
-    volumes:
-      - '/path/to/config:/config'
-    ports:
-      - '3001:3001'
-      - '3000:3000'
-    environment:
-      - TZ=Etc/UTC
-      - PGID=1000
-      - PUID=1000
+  obsidian:
+    image: lscr.io/linuxserver/obsidian:latest
     container_name: obsidian
+    environment:
+      - PUID=501 # Replace with your host user's PUID (run 'id -u' on your host)
+      - PGID=20 # Replace with your host user's PGID (run 'id -g' on your host)
+      - TZ=America/Chicago # Replace with your local timezone (e.g., America/Chicago)
+    volumes:
+      - ./volume-data/obsidian/config:/config # Host path for Obsidian's config and default vault
+#      - ./volume-data/obsidian/vaults:/config/Library/Application Support/Obsidian/vaults
+    ports:
+      - 3003:3000
+      - 3004:3001
+    shm_size: "1gb" # Recommended for applications with a UI
+    restart: unless-stopped
