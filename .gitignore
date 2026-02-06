@@ -1,3 +1,4 @@
 .idea
 volume-data
 databases/pgdata
+redis_data

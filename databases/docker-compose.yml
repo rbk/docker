@@ -30,9 +30,41 @@ services:
     volumes:
       - ./redis_data:/data
     restart: unless-stopped
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: db-tools-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: false
+      http.cors.allow-origin: "localhost"
+      http.cors.enabled: true
+      http.cors.allow-credentials: true
+      http.cors.allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
+      http.cors.allow-headers: X-Requested-With, X-Auth-Token, Content-Type, Content-Length, Authorization, Access-Control-Allow-Headers, Accept, x-elastic-client-meta
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - ./volume-data/esdata:/usr/share/elasticsearch/data
+  nginx-proxy:
+    image: nginx:1.29.5-alpine
+    volumes:
+      - ./volume-data/nginx/templates:/etc/nginx/templates
+    ports:
+      - "6969:80"
+    environment:
+      - NGINX_PORT=80
+  nginx-test:
+    image: nginx:1.29.5-alpine
+    volumes:
+      - ./volume-data/nginx2/templates:/etc/nginx/templates
+    ports:
+      - "6988:81"
+    environment:
+      - NGINX_PORT=81
 volumes:
-  pgdata: {}
+  pgdata: { }
 networks:
-  default: {}
+  default: { }
 
 
